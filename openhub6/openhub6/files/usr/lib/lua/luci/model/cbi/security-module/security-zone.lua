@@ -1,6 +1,6 @@
 m = Map("security-zone", translate("Zone Labels"), translate(""))
 
-d = m:section(TypedSection, "info", "Zones 1 to 16")
+d = m:section(TypedSection, "info", "Zones 1 to 16"); d.anonymous=true;
 a = d:option(Value, "001", "Zone 1"); a.optional=false; a.rmempty = false;
 a = d:option(Value, "002", "Zone 2"); a.optional=false; a.rmempty = false;
 a = d:option(Value, "003", "Zone 3"); a.optional=false; a.rmempty = false;
@@ -18,7 +18,7 @@ a = d:option(Value, "014", "Zone 14"); a.optional=false; a.rmempty = false;
 a = d:option(Value, "015", "Zone 15"); a.optional=false; a.rmempty = false;
 a = d:option(Value, "016", "Zone 16"); a.optional=false; a.rmempty = false;
 
-d = m:section(TypedSection, "info", "Zones 17 to 32")
+d = m:section(TypedSection, "info", "Zones 17 to 32"); d.anonymous=true;
 a = d:option(Value, "017", "Zone 17"); a.optional=false; a.rmempty = false;
 a = d:option(Value, "018", "Zone 18"); a.optional=false; a.rmempty = false;
 a = d:option(Value, "019", "Zone 19"); a.optional=false; a.rmempty = false;
@@ -36,7 +36,7 @@ a = d:option(Value, "030", "Zone 30"); a.optional=false; a.rmempty = false;
 a = d:option(Value, "031", "Zone 31"); a.optional=false; a.rmempty = false;
 a = d:option(Value, "032", "Zone 32"); a.optional=false; a.rmempty = false;
 
-d = m:section(TypedSection, "info", "Zones 33 to 48")
+d = m:section(TypedSection, "info", "Zones 33 to 48"); d.anonymous=true;
 a = d:option(Value, "033", "Zone 33"); a.optional=false; a.rmempty = false;
 a = d:option(Value, "034", "Zone 34"); a.optional=false; a.rmempty = false;
 a = d:option(Value, "035", "Zone 35"); a.optional=false; a.rmempty = false;
@@ -54,7 +54,7 @@ a = d:option(Value, "046", "Zone 46"); a.optional=false; a.rmempty = false;
 a = d:option(Value, "047", "Zone 47"); a.optional=false; a.rmempty = false;
 a = d:option(Value, "048", "Zone 48"); a.optional=false; a.rmempty = false;
 
-d = m:section(TypedSection, "info", "Zones 49 to 64")
+d = m:section(TypedSection, "info", "Zones 49 to 64"); d.anonymous=true;
 a = d:option(Value, "049", "Zone 49"); a.optional=false; a.rmempty = false;
 a = d:option(Value, "050", "Zone 50"); a.optional=false; a.rmempty = false;
 a = d:option(Value, "051", "Zone 51"); a.optional=false; a.rmempty = false;
