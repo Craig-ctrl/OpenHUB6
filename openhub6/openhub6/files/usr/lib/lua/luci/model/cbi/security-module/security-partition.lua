@@ -1,6 +1,6 @@
 m = Map("security-partition", translate("Partition Labels"), translate(""))
-d = m:section(TypedSection, "info", "")
 
+d = m:section(TypedSection, "info", ""); d.anonymous=true;
 a = d:option(Value, "1", "Partition 1"); a.optional=false; a.rmempty = false;
 a = d:option(Value, "2", "Partition 2"); a.optional=false; a.rmempty = false;
 a = d:option(Value, "3", "Partition 3"); a.optional=false; a.rmempty = false;
