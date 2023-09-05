@@ -18,7 +18,7 @@ end
 
 s = m:section(TypedSection, "info", "Home Assistant"); s.anonymous=true;
 a = s:option(Value, "ha_ip", "HA MQTT IP Address"); a.optional=false; a.rmempty=false; a.datatype="ip4addr";
-a = s:option(Value, "ha_port", "HA MQTT Port"); a.optional=false; a.rmempty=false;
+a = s:option(Value, "ha_port", "HA MQTT Port"); a.optional=false; a.rmempty=false; a.datatype="port";
 a = s:option(Value, "ha_user", "HA MQTT User Name"); a.optional=false; a.rmempty=false;
 a = s:option(Value, "ha_pass", "HA MQTT Password"); a.optional=false; a.rmempty=false; a.password=true;
 
