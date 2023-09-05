@@ -1,6 +1,6 @@
 m = Map("security-user", translate("User Labels"), translate(""))
 
-d = m:section(TypedSection, "info", "Regular User Codes")
+d = m:section(TypedSection, "info", "Regular User Codes"); d.anonymous=true;
 a = d:option(Value, "01", "Regular User Code 1"); a.optional=false; a.rmempty = false;
 a = d:option(Value, "02", "Regular User Code 2"); a.optional=false; a.rmempty = false;
 a = d:option(Value, "03", "Regular User Code 3"); a.optional=false; a.rmempty = false;
@@ -34,14 +34,14 @@ a = d:option(Value, "30", "Regular User Code 30"); a.optional=false; a.rmempty =
 a = d:option(Value, "31", "Regular User Code 31"); a.optional=false; a.rmempty = false;
 a = d:option(Value, "32", "Regular User Code 32"); a.optional=false; a.rmempty = false;
 
-d = m:section(TypedSection, "info", "Duress Codes")
+d = m:section(TypedSection, "info", "Duress Codes"); d.anonymous=true;
 a = d:option(Value, "33", "Duress Code 33"); a.optional=false; a.rmempty = false;
 a = d:option(Value, "34", "Duress Code 34"); a.optional=false; a.rmempty = false;
 
-d = m:section(TypedSection, "info", "Master Code")
+d = m:section(TypedSection, "info", "Master Code"); d.anonymous=true;
 a = d:option(Value, "40", "Master Code 40"); a.optional=false; a.rmempty = false;
 
-d = m:section(TypedSection, "info", "Partition Master Codes")
+d = m:section(TypedSection, "info", "Partition Master Codes"); d.anonymous=true;
 a = d:option(Value, "41", "Partition Master Code 41"); a.optional=false; a.rmempty = false;
 a = d:option(Value, "42", "Partition Master Code 42"); a.optional=false; a.rmempty = false;
 
