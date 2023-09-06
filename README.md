@@ -49,6 +49,7 @@ Add to your **configuration.yaml**:
   - Update the "device_class" to the type of sensor
 
 ![Home Assistant Alarm screenshot](/assets/home_assist_alarm.png | width=100)
+<img src="/assets/home_assist_alarm.png" width="50%" height="50%" />
 
 ## 📨 Telegram Setup
 
