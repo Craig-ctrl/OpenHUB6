@@ -14,8 +14,6 @@ logger -t $0 "listener started"
 
 # init serial comms with the it-100 at 9600 baud
 # it-100 is wired to the ftdi usb-serial /dev/ttyUSB0
-#daemon.err dsc-it100[15342]: /usr/bin/dsc-it100: line 19: stty: not found
-#  if you get the above error but it's otherwise working, you can disregard it.
 stty -F /dev/ttyUSB0 9600 clocal cread cs8 -cstopb -parenb
 logger -t $0 "serial initialized"
 
@@ -51,42 +49,40 @@ while read -s raw < /dev/ttyUSB0; do
   # setup event
   event=""
 
+  # setup notify label (for flags to notifications)
+  notifylabel=""
+
   ## Home Assistant message
   haTopic=""
   haMsg=""
 
   # handle partition labels when required
-  # cmds 650,651,652,653,654,655,656,657,658,659,660,670,671,672,673,700,701,702,750,751,840,841,900
-  case $cmd in 650|651|652|653|654|655|656|657|658|659|660|670|671|672|673|700|701|702|750|751|840|841|900)
-    # get the partition from cmddata
-    partition=${cmddata:3:1}
-
-    # get the partition label for the partition number
-    partitionlabel=`uci get security-partition.label.$partition`
-    ;;
-  esac
+  # cmds 601,602,603,604,650,651,652,653,654,655,656,657,658,659,660,670,671,672,673, 700,701,702,750,751,840,841,900
+  case $cmd in 601|602|603|604|650|651|652|653|654|655|656|657|658|659|660|670|671|672|673|700|701|702|750|751|840|841|900)
+    partition=${cmddata:3:1}                                      # get the partition from cmddata
+    partitionlabel=`uci get security-partition.label.$partition`  # get the partition label for the partition number
+  ;; esac
 
   # handle zone labels when required
-  # cmds 609,610,821,822
-  case $cmd in 609|610|821|822)
-    # get the zone number from cmddata
-    zone=${cmddata:3:3}
+  # cmds 601,602,603,604
+  case $cmd in 601|602|603|604)
+    zone=${cmddata:4:3}                               # get the zone number from cmddata
+    zonelabel=`uci get security-zone.label.$zone`     # get the zone label for the zone number
+  ;; esac
 
-    # get the zone label for the zone number
-    zonelabel=`uci get security-zone.label.$zone`
-    ;;
-  esac
+  # handle zone labels when required
+  # cmds 605,606,609,610,821,822
+  case $cmd in 605|606|609|610|821|822)
+    zone=${cmddata:3:3}                               # get the zone number from cmddata
+    zonelabel=`uci get security-zone.label.$zone`     # get the zone label for the zone number
+  ;; esac
 
   # handle user labels when required
   # cmds 700,750
   case $cmd in 700|750)
-    # get the user number from cmddata
-    user=${cmddata:6:2}
-
-    # get the user label for the user number
-    userlabel=`uci get security-user.label.$user`
-    ;;
-  esac
+    user=${cmddata:6:2}                               # get the user number from cmddata
+    userlabel=`uci get security-user.label.$user`     # get the user label for the user number
+  ;; esac
 
   # handle non-standard event responses with addl data
   # additional variable for slightly different events
@@ -98,423 +94,465 @@ while read -s raw < /dev/ttyUSB0; do
   case $cmd in
   500) # Command Acknowledge (command received)
     event="Command Acknowledge (500)"
-    ;;
+  ;;
 
   501) # Command Error
     event="Command Error (501)"
-    ;;
+  ;;
 
   502) # System Error
     event="System Error (502)"
-    ;;
+  ;;
 
   550) # Time/Date Broadcast
     event="Time/Date Broadcast (550)"
-    ;;
+  ;;
 
   560) # Ring Detected (Ring on the telephone line)
     event="Ring Detected (560)"
-    ;;
+  ;;
 
   561) # Indoor Temperature Broadcast
     event="Indoor Temperature Broadcast (561)"
-    ;;
+  ;;
 
   562) # Outdoor Temperature Broadcast
     event="Outdoor Temperatrure Broadcast (562)"
-    ;;
+  ;;
 
   563) # Thermostat Set Points
     event="Thermostat Set Points (563)"
-    ;;
+  ;;
 
   570) # Broadcast Labels
     event="Broadcast Labels (570)"
-    ;;
+  ;;
 
   580) # Baud Rate Set
     event="Baud Rate Set (580)"
-    ;;
+  ;;
 
   601) # Zone ALARM
-    partition=${cmddata:3:1}
-    partitionlabel=`uci get security-partition.label.$partition`
-    zone=${cmddata:4:3}
-    zonelabel=`uci get security-zone.label.$zone`
     event="Zone Alarm (601) $partitionlabel ($partition) $zonelabel ($zone)"
-    ;;
+    haTopic=$HA_TOPICSTATUS$partition
+    haMsg="triggered"
+  ;;
 
-  602) # Zone Alarm Restore
-    partition=${cmddata:3:1}
-    partitionlabel=`uci get security-partition.label.$partition`
-    zone=${cmddata:4:3}
-    zonelabel=`uci get security-zone.label.$zone`
+  602) # Zone Alarm RESTORE
     event="Zone Alarm Restore (602) $partitionlabel ($partition) $zonelabel ($zone)"
-    ;;
+    haTopic=$HA_TOPICSTATUS$partition
+    haMsg="disarmed"
+  ;;
 
-  603) # Zone Tamper
-    partition=${cmddata:3:1}
-    partitionlabel=`uci get security-partition.label.$partition`
-    zone=${cmddata:4:3}
-    zonelabel=`uci get security-zone.label.$zone`
+  603) # Zone TAMPER
     event="Zone Tamper (603) $partitionlabel ($partition) $zonelabel ($zone)"
-    ;;
+    haTopic=$HA_TOPICTROUBLE ## Handle TROUBLE states for Home Assistant
+    haMsg="1"
+  ;;
 
-  604) # Zone Tamper Restore
-    partition=${cmddata:3:1}
-    partitionlabel=`uci get security-partition.label.$partition`
-    zone=${cmddata:4:3}
-    zonelabel=`uci get security-zone.label.$zone`
+  604) # Zone Tamper RESTORE
     event="Zone Tamper Restore (604) $partitionlabel ($partition) $zonelabel ($zone)"
-    ;;
+    haTopic=$HA_TOPICTROUBLE ## Handle TROUBLE states for Home Assistant
+    haMsg="0"
+  ;;
 
   605) # Zone Fault
-    zone=${cmddata:3:3}
-    zonelabel=`uci get security-zone.label.$zone`
     event="Zone Fault (605) $zonelabel ($zone)"
-    ;;
+    haTopic=$HA_TOPICTROUBLE ## Handle TROUBLE states for Home Assistant
+    haMsg="1"
+  ;;
 
   606) # Zone Fault Restore
-    zone=${cmddata:3:3}
-    zonelabel=`uci get security-zone.label.$zone`
     event="Zone Fault Restore (606) $zonelabel ($zone)"
-    ;;
+    haTopic=$HA_TOPICTROUBLE ## Handle TROUBLE states for Home Assistant
+    haMsg="0"
+  ;;
 
   609) # Zone Open
-    zone=${cmddata:3:3}
-    zonelabel=`uci get security-zone.label.$zone`
     event="Zone Open (609) $zonelabel ($zone)"
-    #haTopic=$HA_TOPICZONE${zone:2:1}
-    haTopic=$HA_TOPICZONE$zone
+    haTopic=$HA_TOPICZONE${zone:2:1}
     haMsg="1"
-    ;;
+  ;;
 
   610) # Zone Restored
-    zone=${cmddata:3:3}
-    zonelabel=`uci get security-zone.label.$zone`
     event="Zone Restored (610) $zonelabel ($zone)"
-    #haTopic=$HA_TOPICZONE${zone:2:1}
-    haTopic=$HA_TOPICZONE$zone
+    haTopic=$HA_TOPICZONE${zone:2:1}
     haMsg="0"
-    ;;
+  ;;
 
   620) # Duress ALARM
     event="Duress Alarm (620)"
-    ;;
+    haTopic=$HA_TOPICSTATUS$partition
+    haMsg="triggered"
+  ;;
 
   621) # [F] Key ALARM (Fire keypad button pressed for alarm)
     event="[F] Key Alarm (621)"
-    ;;
+    haTopic=$HA_TOPICSTATUS$partition
+    haMsg="triggered"
+  ;;
 
   622) # [F] Key Restoral
     event="[F] Key Restoral (622)"
-    ;;
+    haTopic=$HA_TOPICSTATUS$partition
+    haMsg="disarmed"
+  ;;
 
   623) # [A] Key ALARM (Auxiliary keypad button pressed for alarm)
     event="[A] Key Alarm (623)"
-    ;;
+    haTopic=$HA_TOPICSTATUS$partition
+    haMsg="triggered"
+  ;;
 
   624) # [A] Key Restoral
     event="[A] Key Restoral (624)"
-    ;;
+    haTopic=$HA_TOPICSTATUS$partition
+    haMsg="disarmed"
+  ;;
 
   625) # [P] Key ALARM (Panic keypad button pressed for alarm)
     event="[P] Key Alarm (625)"
-    ;;
+    haTopic=$HA_TOPICSTATUS$partition
+    haMsg="triggered"
+  ;;
 
   626) # [P] Key Restoral
     event="[P] Key Restoral (626)"
-    ;;
+    haTopic=$HA_TOPICSTATUS$partition
+    haMsg="disarmed"
+  ;;
 
   631) # Auxiliary Input ALARM (2-wire smoke alarm)
     event="Auxiliary Input Alarm (631)"
-    ;;
+    haTopic=$HA_TOPICSTATUS$partition
+    haMsg="triggered"
+  ;;
 
   632) # Auxiliary Input Alarm Restored
     event="Auxiliary Input Alarm Restored (632)"
-    ;;
+    haTopic=$HA_TOPICSTATUS$partition
+    haMsg="disarmed"
+  ;;
 
   650) # Partition Ready (the partition is ready and can be armed)
     event="Partition Ready (650) $partitionlabel ($partition)"
-    ;;
+  ;;
 
   651) # Partition Not Ready
     event="Partition Not Ready (651) $partitionlabel ($partition)"
-    ;;
+  ;;
 
   652) # Partition Armed - Descriptive Mode
-    partition=${cmddata:3:1}
-    partitionlabel=`uci get security-partition.label.$partition`
     data1=${cmddata:4:1}
     haTopic=$HA_TOPICSTATUS$partition
     # handle mode
     case $data1 in
       0) # Away
-      data2="Away"
-      haMsg="armed_away"
+        data2="Away"
+        haMsg="armed_away"
       ;;
       1) # Stay
-      data2="Stay"
-      haMsg="armed_home"
+        data2="Stay"
+        haMsg="armed_home"
       ;;
       2) # Away, No Delay
-      data2="Away, No Delay"
-      haMsg="armed_away"
+        data2="Away, No Delay"
+        haMsg="armed_away"
       ;;
       3) # Stay, No Delay
-      data2="Stay, No Delay"
-      haMsg="armed_home"
+        data2="Stay, No Delay"
+        haMsg="armed_home"
       ;;
     esac
     #event="Partition Armed - Descriptive Mode (652)" #default
     event="Partition Armed (652) $partitionlabel ($partition) Armed $data2"
-    ;;
+  ;;
 
   653) # Partition in Ready to Force Arm
     event="Partition in Ready to Force Arm (653) $partitionlabel ($partition)"
-    ;;
+  ;;
 
   654) # Partition In ALARM
     event="Partition In Alarm (654) $partitionlabel ($partition)"
     haTopic=$HA_TOPICSTATUS$partition
     haMsg="triggered"
-    ;;
+  ;;
 
   655) # Partition Disarmed
     event="Partition Disarmed (655) $partitionlabel ($partition)"
     haTopic=$HA_TOPICSTATUS$partition
     haMsg="disarmed"
-    ;;
+  ;;
 
   656) # Exit Delay in Progress
     event="Exit Delay in Progress (656) $partitionlabel ($partition)"
-    #haTopic=$HA_TOPICSTATUS$partition
-    #haMsg="arming"
-    ;;
+    haTopic=$HA_TOPICSTATUS$partition
+    haMsg="arming"
+  ;;
 
   657) # Entry Delay in Progress
     event="Entry Delay in Progress (657) $partitionlabel ($partition)"
-    #haTopic=$HA_TOPICSTATUS$partition
-    #haMsg="disarming"
-    ;;
+    haTopic=$HA_TOPICSTATUS$partition
+    haMsg="disarming"
+  ;;
 
   658) # Keypad Lock-out (too many failed user attempts)
     event="Keypad Lock-out (658) $partitionlabel ($partition)"
-    ;;
+  ;;
 
   659) # Keypad Blanking
     event="Keypad Blanking (659) $partitionlabel ($partition)"
-    ;;
+  ;;
 
   660) # Command Output In Progress
     event="Command Output In Progress (660) $partitionlabel ($partition)"
-    ;;
+  ;;
 
   670) # Invalid Access Code
     event="Invalid Access Code (670) $partitionlabel ($partition)"
-    ;;
+  ;;
 
   671) # Function Not Available
     event="Function Not Available (671) $partitionlabel ($partition)"
-    ;;
+  ;;
 
   672) # Fail to Arm
     event="Fail to Arm (672) $partitionlabel ($partition)"
-    ;;
+  ;;
 
   673) # Partition Busy
     event="Partition Busy (673) $partitionlabel ($partition)"
-    ;;
+  ;;
 
   700) # User Closing
     event="User Closing (700) $userlabel ($user)"
-    ;;
+  ;;
 
   701) # Special Closing
     event="Special Closing (701) $partitionlabel ($partition)"
-    ;;
+  ;;
 
   702) # Partial Closing
     event="Partial Closing (702) $partitionlabel ($partition)"
-    ;;
+  ;;
 
   750) # User Opening
     event="User Opening (750) $userlabel ($user)"
-    ;;
+  ;;
 
   751) # Special Opening
     event="Special Opening (751) $partitionlabel ($partition)"
-    ;;
+  ;;
 
-  800) # Panel Battery Trouble (low battery)
+  800) # Panel Battery TROUBLE (low battery)
     event="Panel Battery Trouble (800)"
-    ;;
+    haTopic=$HA_TOPICTROUBLE ## Handle TROUBLE states for Home Assistant
+    haMsg="1"
+  ;;
 
-  801) # Panel Battery Trouble Restore
+  801) # Panel Battery Trouble RESTORE
     event="Panel Battery Trouble Restore (801)"
-    ;;
+    haTopic=$HA_TOPICTROUBLE ## Handle trouble RESTORE states for Home Assistant
+    haMsg="0"
+  ;;
 
-  802) # Panel AC Trouble (lost AC power)
+  802) # Panel AC TROUBLE (lost AC power)
     event="Panel AC Trouble (802)"
-    ;;
+    haTopic=$HA_TOPICTROUBLE ## Handle TROUBLE states for Home Assistant
+    haMsg="1"
+  ;;
 
-  803) # Panel AC Restore
+  803) # Panel AC RESTORE
     event="Panel AC Restore (803)"
-    ;;
+    haTopic=$HA_TOPICTROUBLE ## Handle trouble RESTORE states for Home Assistant
+    haMsg="0"
+  ;;
 
-  806) # System Bell Trouble
+  806) # System Bell TROUBLE
     event="System Bell Trouble (806)"
-    ;;
+    haTopic=$HA_TOPICTROUBLE ## Handle TROUBLE states for Home Assistant
+    haMsg="1"
+  ;;
 
-  807) # System Bell Trouble Restoral
+  807) # System Bell Trouble RESTORED
     event="System Bell Trouble Restoral (807)"
-    ;;
+    haTopic=$HA_TOPICTROUBLE ## Handle trouble RESTORE states for Home Assistant
+    haMsg="0"
+  ;;
 
-  810) # TLM raw 1 Trouble (Phone line)
+  810) # TLM raw 1 TROUBLE (Phone line)
     event="TLM raw 1 Trouble (810)"
-    ;;
+    haTopic=$HA_TOPICTROUBLE ## Handle TROUBLE states for Home Assistant
+    haMsg="1"
+  ;;
 
-  811) # TLM raw 1 Trouble Restored
+  811) # TLM raw 1 Trouble RESTORED
     event="TLM raw 1 Trouble Restored (811)"
-    ;;
+    haTopic=$HA_TOPICTROUBLE ## Handle trouble RESTORE states for Home Assistant
+    haMsg="0"
+  ;;
 
-  812) # TLM raw 2 Trouble (Phone line)
+  812) # TLM raw 2 TROUBLE (Phone line)
     event="TLM raw 2 Trouble (812)"
-    ;;
+    haTopic=$HA_TOPICTROUBLE ## Handle TROUBLE states for Home Assistant
+    haMsg="1"
+  ;;
 
-  813) # TLM raw 2 Trouble Restored
+  813) # TLM raw 2 Trouble RESTORED
     event="TLM raw 2 Trouble Restored (813)"
-    ;;
+    haTopic=$HA_TOPICTROUBLE ## Handle trouble RESTORE states for Home Assistant
+    haMsg="0"
+  ;;
 
   814) # FTC Trouble (Failed to Communicate with monitoring station)
     event="FTC Trouble (814)"
-    ;;
+  ;;
 
   816) # Buffer Near Full
     event="Buffer Near Full (816)"
-    ;;
+  ;;
 
-  821) # General Device Low Battery
+  821) # General Device Low Battery TROUBLE
     event="General Device Low Battery (821) $zonelabel ($zone)"
-    ;;
+    haTopic=$HA_TOPICTROUBLE ## Handle TROUBLE states for Home Assistant
+    haMsg="1"
+  ;;
 
-  822) # General Device Low Battery Restore
+  822) # General Device Low Battery RESTORE
     event="General Device Low Battery Restore (822) $zonelabel ($zone)"
-    ;;
+    haTopic=$HA_TOPICTROUBLE ## Handle trouble RESTORE states for Home Assistant
+    haMsg="0"
+  ;;
 
-  825) # Wireless Key Low Battery Trouble
+  825) # Wireless Key Low Battery TROUBLE
     event="Wireless Key Low Battery Trouble (825)"
-    ;;
+    haTopic=$HA_TOPICTROUBLE ## Handle TROUBLE states for Home Assistant
+    haMsg="1"
+  ;;
 
-  826) # Wireless Key Low Battery Trouble Restore
+  826) # Wireless Key Low Battery Trouble RESTORE
     event="Wireless Key Low Battery Trouble Restore (826)"
-    ;;
+    haTopic=$HA_TOPICTROUBLE ## Handle trouble RESTORE states for Home Assistant
+    haMsg="0"
+  ;;
 
-  827) # Handheld Keypad Low Battery Trouble
+  827) # Handheld Keypad Low Battery TROUBLE
     event="Handheld Keypad Low Battery Trouble (827)"
-    ;;
+    haTopic=$HA_TOPICTROUBLE ## Handle TROUBLE states for Home Assistant
+    haMsg="1"
+  ;;
 
-  828) # Handheld Keypad Low Battery Restore Restored
+  828) # Handheld Keypad Low Battery Restore RESTORED
     event="Handheld Keypad Low Battery Restore Restored (828)"
-    ;;
+    haTopic=$HA_TOPICTROUBLE ## Handle trouble RESTORE states for Home Assistant
+    haMsg="0"
+  ;;
 
-  829) # General System Tamper
+  829) # General System TAMPER
     event="General System Tamper (829)"
-    ;;
+    haTopic=$HA_TOPICTROUBLE ## Handle TROUBLE states for Home Assistant
+    haMsg="1"
+  ;;
 
-  830) # General System Tamper Restore
+  830) # General System Tamper RESTORE
     event="General System Tamper Restore (830)"
-    ;;
+    haTopic=$HA_TOPICTROUBLE ## Handle trouble RESTORE states for Home Assistant
+    haMsg="0"
+  ;;
 
-  831) # Home Automation Trouble
+  831) # Home Automation TROUBLE
     event="Home Automation Trouble (831)"
-    ;;
+    haTopic=$HA_TOPICTROUBLE ## Handle TROUBLE states for Home Assistant
+    haMsg="1"
+  ;;
 
-  832) # Home Automation Trouble Restore
+  832) # Home Automation Trouble RESTORE
     event="Home Automation Trouble Restore (832)"
-    ;;
+    haTopic=$HA_TOPICTROUBLE ## Handle trouble RESTORE states for Home Assistant
+    haMsg="0"
+  ;;
 
-  840) # Trouble Status (LED ON)
+  840) # TROUBLE Status (LED ON)
     event="Trouble Status (LED ON) (840) $partitionlabel ($partition)"
-    ;;
+    haTopic=$HA_TOPICTROUBLE ## Handle TROUBLE states for Home Assistant
+    haMsg="1"
+  ;;
 
-  841) # Trouble Status Restore (LED OFF)
+  841) # Trouble Status RESTORE (LED OFF)
     event="Trouble Status Restore (LED OFF) (841) $partitionlabel ($partition)"
-    ;;
+    haTopic=$HA_TOPICTROUBLE ## Handle trouble RESTORE states for Home Assistant
+    haMsg="0"
+  ;;
 
-  842) # Fire Trouble Alarm
+  842) # Fire TROUBLE Alarm
     event="Fire Trouble Alarm (842)"
-    ;;
+    haTopic=$HA_TOPICTROUBLE ## Handle TROUBLE states for Home Assistant
+    haMsg="1"
+  ;;
 
-  843) # Fire Trouble Alarm Restored
+  843) # Fire Trouble Alarm RESTORED
     event="Fire Trouble Alarm Restored (843)"
-    ;;
+    haTopic=$HA_TOPICTROUBLE ## Handle trouble RESTORE states for Home Assistant
+    haMsg="0"
+  ;;
 
   900) # Code Required
     event="Code Required (900) $partitionlabel ($partition)"
-    ;;
+  ;;
 
   901) # LCD Update
     event="LCD Update (901)"
-    ;;
+  ;;
 
   902) # LCD Cursor
     event="LCD Cursor (902)"
-    ;;
+  ;;
 
   903) # LED Status
     event="LED Status (903)"
-    ;;
+  ;;
 
   904) # Beep Status
     event="Beep Status (904)"
-    ;;
+  ;;
 
   905) # Tone Status
     event="Tone Status (905)"
-    ;;
+  ;;
 
   906) # Buzzer Status
     event="Buzzer Status (906)"
-    ;;
+  ;;
 
   907) # Door Chime Status
     event="Door Chime Status (907)"
-    ;;
+  ;;
 
   908) # Software Version
     event="Software Version (908)"
-    ;;
+  ;;
   esac
 
-  ## Handle TROUBLE states for Home Assistant
-  case $cmd in 800|802|806|810|812|821|825|827|829|831|842)
-    haTopic=$HA_TOPICTROUBLE
-    haMsg="1"
-    ;;
-  esac
-  ## Handle trouble RESTORE states for Home Assistant
-  case $cmd in 801|803|807|811|813|822|826|828|830|832|843)
-    haTopic=$HA_TOPICTROUBLE
-    haMsg="0"
-    ;;
-  esac
 
   # handle event (if not blank)
   if [[ ! -z "$event" ]]
   then
     #echo event=$event
 
-    # syslog the event
-    #logger -t $0 "raw=$raw cmddata=$cmddata cmd=$cmd event=$event"
-
     # run notify script in background(&) with arguments: cmd cmddata event haTopic haMsg
     #`uci get security-event.cmd.$cmd` "$cmd" "$cmddata" "$event" &
     #/root/event-notifier.sh "$cmd" "$cmddata" "$event" "$haTopic" "$haMsg" &
 
     ## get the Notifier Event label based on the command
-    notifylabel=""
     notifylabel=`uci -q get alarm-event.cmd.$cmd`
+
+    # Manage motion sensor notifications separately
+    case $cmd in 609|610)
+      case $zonelabel in
+          *Motion*)
+              notifylabel=`uci get alarm-event.cmd.zone_motion_notify`
+      ;; esac
+    ;; esac
 
     # System Log
     case $notifylabel in
