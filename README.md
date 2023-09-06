@@ -48,7 +48,7 @@ Add to your **configuration.yaml**:
   - Add and name your zones to match with your alarm panel
   - Update the "device_class" to the type of sensor
 
-<img src="/assets/home_assist_alarm.png" width="50%" height="50%" />
+<img src="/assets/home_assist_alarm.png" width="25%" height="25%" />
 
 ## 📨 Telegram Setup
 
