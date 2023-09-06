@@ -1,7 +1,6 @@
 m = Map("alarm-event", translate("New Event Settings"), translate(""))
-d = m:section(TypedSection, "info", "")
+d = m:section(TypedSection, "info", ""); d.anonymous=true;
 
---dv = d:option(DummyValue, "_dummy", translate(""), translate("Notifications: P=Pushover - T=Telegram - H=Home Assistant - L=System Log (always use)"));
 a = d:option(MultiValue, "500", "Command Acknowledge (500)");           a:value("L", "Logger"); a:value("T", "Telegram"); a:value("P", "Pushover"); a:value("H", "HomeAssistant");
 a = d:option(MultiValue, "501", "Command Error (501)");                 a:value("L", "Logger"); a:value("T", "Telegram"); a:value("P", "Pushover"); a:value("H", "HomeAssistant");
 a = d:option(MultiValue, "502", "System Error (502)");                  a:value("L", "Logger"); a:value("T", "Telegram"); a:value("P", "Pushover"); a:value("H", "HomeAssistant");
@@ -20,6 +19,7 @@ a = d:option(MultiValue, "605", "Zone Fault (605)");                    a:value(
 a = d:option(MultiValue, "606", "Zone Fault Restore (606)");            a:value("L", "Logger"); a:value("T", "Telegram"); a:value("P", "Pushover"); a:value("H", "HomeAssistant");
 a = d:option(MultiValue, "609", "Zone Open (609)");                     a:value("L", "Logger"); a:value("T", "Telegram"); a:value("P", "Pushover"); a:value("H", "HomeAssistant");
 a = d:option(MultiValue, "610", "Zone Restored (610)");                 a:value("L", "Logger"); a:value("T", "Telegram"); a:value("P", "Pushover"); a:value("H", "HomeAssistant");
+a = d:option(MultiValue, "zone_motion_notify", "Zone Motion Sensor Notification", translate("If checked, send a Notification for all motion sensor activations (events 609,610).")); a:value("L", "Logger"); a:value("T", "Telegram"); a:value("P", "Pushover"); a:value("H", "HomeAssistant");
 a = d:option(MultiValue, "620", "Duress Alarm (620)");                  a:value("L", "Logger"); a:value("T", "Telegram"); a:value("P", "Pushover"); a:value("H", "HomeAssistant");
 a = d:option(MultiValue, "621", "[F] Key Alarm (621)");                 a:value("L", "Logger"); a:value("T", "Telegram"); a:value("P", "Pushover"); a:value("H", "HomeAssistant");
 a = d:option(MultiValue, "622", "[F] Key Restoral (622)");              a:value("L", "Logger"); a:value("T", "Telegram"); a:value("P", "Pushover"); a:value("H", "HomeAssistant");
