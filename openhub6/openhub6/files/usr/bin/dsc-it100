@@ -550,7 +550,7 @@ while read -s raw < /dev/ttyUSB0; do
     case $cmd in 609|610)
       case $zonelabel in
           *Motion*)
-              notifylabel=`uci get alarm-event.cmd.zone_motion_notify`
+              notifylabel=`uci -q get alarm-event.cmd.zone_motion_notify`
       ;; esac
     ;; esac
 
