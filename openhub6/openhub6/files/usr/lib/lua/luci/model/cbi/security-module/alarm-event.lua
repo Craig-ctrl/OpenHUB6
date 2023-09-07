@@ -1,6 +1,6 @@
 m = Map("alarm-event", translate("New Event Settings"), translate(""))
-d = m:section(TypedSection, "info", ""); d.anonymous=true;
 
+d = m:section(TypedSection, "info", "General Notifications"); d.anonymous=true;
 a = d:option(MultiValue, "500", "Command Acknowledge (500)");           a:value("L", "Logger"); a:value("T", "Telegram"); a:value("P", "Pushover"); a:value("H", "HomeAssistant");
 a = d:option(MultiValue, "501", "Command Error (501)");                 a:value("L", "Logger"); a:value("T", "Telegram"); a:value("P", "Pushover"); a:value("H", "HomeAssistant");
 a = d:option(MultiValue, "502", "System Error (502)");                  a:value("L", "Logger"); a:value("T", "Telegram"); a:value("P", "Pushover"); a:value("H", "HomeAssistant");
@@ -11,6 +11,7 @@ a = d:option(MultiValue, "562", "Outdoor Temperatrure Broadcast (562)"); a:value
 a = d:option(MultiValue, "563", "Thermostat Set Points (563)");         a:value("L", "Logger"); a:value("T", "Telegram"); a:value("P", "Pushover"); a:value("H", "HomeAssistant");
 a = d:option(MultiValue, "570", "Broadcast Labels (570)");              a:value("L", "Logger"); a:value("T", "Telegram"); a:value("P", "Pushover"); a:value("H", "HomeAssistant");
 a = d:option(MultiValue, "580", "Baud Rate Set (580)");                 a:value("L", "Logger"); a:value("T", "Telegram"); a:value("P", "Pushover"); a:value("H", "HomeAssistant");
+d = m:section(TypedSection, "info", "Alarm State Notifications"); d.anonymous=true;
 a = d:option(MultiValue, "601", "Zone Alarm (601)");                    a:value("L", "Logger"); a:value("T", "Telegram"); a:value("P", "Pushover"); a:value("H", "HomeAssistant");
 a = d:option(MultiValue, "602", "Zone Alarm Restore (602)");            a:value("L", "Logger"); a:value("T", "Telegram"); a:value("P", "Pushover"); a:value("H", "HomeAssistant");
 a = d:option(MultiValue, "603", "Zone Tamper (603)");                   a:value("L", "Logger"); a:value("T", "Telegram"); a:value("P", "Pushover"); a:value("H", "HomeAssistant");
@@ -49,6 +50,7 @@ a = d:option(MultiValue, "701", "Special Closing (701)");               a:value(
 a = d:option(MultiValue, "702", "Partial Closing (702)");               a:value("L", "Logger"); a:value("T", "Telegram"); a:value("P", "Pushover"); a:value("H", "HomeAssistant");
 a = d:option(MultiValue, "750", "User Opening (750)");                  a:value("L", "Logger"); a:value("T", "Telegram"); a:value("P", "Pushover"); a:value("H", "HomeAssistant");
 a = d:option(MultiValue, "751", "Special Opening (751)");               a:value("L", "Logger"); a:value("T", "Telegram"); a:value("P", "Pushover"); a:value("H", "HomeAssistant");
+d = m:section(TypedSection, "info", "Trouble Notifications"); d.anonymous=true;
 a = d:option(MultiValue, "800", "Panel Battery Trouble (800)");         a:value("L", "Logger"); a:value("T", "Telegram"); a:value("P", "Pushover"); a:value("H", "HomeAssistant");
 a = d:option(MultiValue, "801", "Panel Battery Trouble Restore (801)"); a:value("L", "Logger"); a:value("T", "Telegram"); a:value("P", "Pushover"); a:value("H", "HomeAssistant");
 a = d:option(MultiValue, "802", "Panel AC Trouble (802)");              a:value("L", "Logger"); a:value("T", "Telegram"); a:value("P", "Pushover"); a:value("H", "HomeAssistant");
@@ -75,6 +77,7 @@ a = d:option(MultiValue, "840", "Trouble Status (LED ON) (840)");       a:value(
 a = d:option(MultiValue, "841", "Trouble Status Restore (LED OFF) (841)"); a:value("L", "Logger"); a:value("T", "Telegram"); a:value("P", "Pushover"); a:value("H", "HomeAssistant");
 a = d:option(MultiValue, "842", "Fire Trouble Alarm (842)");            a:value("L", "Logger"); a:value("T", "Telegram"); a:value("P", "Pushover"); a:value("H", "HomeAssistant");
 a = d:option(MultiValue, "843", "Fire Trouble Alarm Restored (843)");   a:value("L", "Logger"); a:value("T", "Telegram"); a:value("P", "Pushover"); a:value("H", "HomeAssistant");
+d = m:section(TypedSection, "info", "Other Notifications"); d.anonymous=true;
 a = d:option(MultiValue, "900", "Code Required (900)");                 a:value("L", "Logger"); a:value("T", "Telegram"); a:value("P", "Pushover"); a:value("H", "HomeAssistant");
 a = d:option(MultiValue, "901", "LCD Update (901)");                    a:value("L", "Logger"); a:value("T", "Telegram"); a:value("P", "Pushover"); a:value("H", "HomeAssistant");
 a = d:option(MultiValue, "902", "LCD Cursor (902)");                    a:value("L", "Logger"); a:value("T", "Telegram"); a:value("P", "Pushover"); a:value("H", "HomeAssistant");
