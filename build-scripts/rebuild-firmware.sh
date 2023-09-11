@@ -2,9 +2,10 @@
 # OpenHUB6 firmware image builder for the HUB6 Safe
 # William Franzin, wfranzin@gmail.com, Feb 6 2022
 # Provided as-is, use at your own risk etc, it's free sw.
+# Updated Sep 9 2023 - Craig Gibson
 
 # Documentation: https://openwrt.org/docs/start
-# Image Builder: https://downloads.openwrt.org/releases/19.07.8/targets/ar71xx/generic/openwrt-imagebuilder-19.07.8-ar71xx-generic.Linux-x86_64.tar.xz
+# Image Builder: https://downloads.openwrt.org/releases/19.07.10/targets/ar71xx/generic/openwrt-imagebuilder-19.07.10-ar71xx-generic.Linux-x86_64.tar.xz
 # Using the Image Builder: https://openwrt.org/docs/guide-user/additional-software/imagebuilder
 
 # Packages determined by using the command below on a development device

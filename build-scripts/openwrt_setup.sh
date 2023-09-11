@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 OPENWRT_PATH=openwrt
-OPENWRT_TAG=v19.07.8
+OPENWRT_TAG=v19.07.10
 APP="openhub6"
 
 while getopts 'p:h' OPTION
