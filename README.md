@@ -41,6 +41,11 @@ This project is not affiliated with or endorsed by HUB6 Inc.
     - Open the Luci User Interface (192.168.255.1)
     - System➡️Startup➡️dsc-it100➡️RESTART
 
+## OpenHub6 Interface Updates
+
+<img src="/assets/alarm_events.jpg" width="25%" height="25%" />
+<img src="/assets/notifications.jpg" width="25%" height="25%" />
+
 ## 🏠 Home Assistant Setup
 
 Add to your **configuration.yaml**:
