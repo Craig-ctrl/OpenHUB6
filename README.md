@@ -43,8 +43,8 @@ This project is not affiliated with or endorsed by HUB6 Inc.
 
 ## OpenHub6 Interface Updates
 
-<img src="/assets/alarm_events.jpg" width="25%" height="25%" />
-<img src="/assets/notifications.jpg" width="25%" height="25%" />
+<img src="/assets/alarm_events.jpg" width="50%" height="50%" />
+<img src="/assets/notifications.jpg" width="50%" height="50%" />
 
 ## 🏠 Home Assistant Setup
 
